@@ -2,10 +2,10 @@ module Data.CRDT.GCounter where
 
 import Prelude
 
-import Data.CRDT (class StateBasedCRDT, State(..))
+import Data.CRDT (class StateBasedCRDT)
 import Data.Foldable (sum)
 import Data.HashMap as Map
-import Data.Ord (greaterThanOrEq, lessThanOrEq)
+import Data.Ord (lessThanOrEq)
 import Data.Replication (ReplicaId)
 import Data.Tuple (Tuple(..))
 import Test.QuickCheck (class Arbitrary, arbitrary)
@@ -24,9 +24,7 @@ instance gCounterArbitrary :: Arbitrary GCounter where
       kvGen = Tuple <$> arbitrary <*> suchThat arbitrary (lessThanOrEq 0)
 
 instance gCounterStateBasedCRDT :: StateBasedCRDT GCounter where
-  mergeStates (State (GCounter a)) (State (GCounter b)) =
-    State <<< GCounter $ Map.unionWith max a b
-
+  merge { data: GCounter a} { data: GCounter b } = GCounter $ Map.unionWith max a b
 
 empty :: GCounter
 empty = GCounter Map.empty

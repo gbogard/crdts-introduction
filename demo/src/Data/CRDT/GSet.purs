@@ -1,4 +1,4 @@
-module CRDT.GSet (
+module Data.CRDT.GSet (
   GSet,
   query,
   insert
@@ -6,7 +6,7 @@ module CRDT.GSet (
   
 import Prelude
 
-import Data.CRDT (class StateBasedCRDT, State(..))
+import Data.CRDT (class StateBasedCRDT, defaultMerge)
 import Data.HashSet as Set
 import Data.Hashable (class Hashable)
 import Test.QuickCheck (class Arbitrary, arbitrary)
@@ -23,7 +23,7 @@ instance arbitraryGSet :: (Arbitrary t, Hashable t) => Arbitrary (GSet t) where
   arbitrary = GSet <<< Set.fromArray <$> arbitrary 
 
 instance stateBasedCRDTGSet :: (Hashable t) => StateBasedCRDT (GSet t) where
-  mergeStates (State a) (State b) = State $ a <> b
+  merge = defaultMerge
 
 query :: forall t. GSet t -> Set.HashSet t 
 query (GSet set) = set

@@ -1,4 +1,4 @@
-module CRDT.TwoPhaseSet (
+module Data.CRDT.TwoPhaseSet (
   TwoPhaseSet,
   insert,
   remove,
@@ -7,7 +7,7 @@ module CRDT.TwoPhaseSet (
   
 import Prelude
 
-import Data.CRDT (class StateBasedCRDT, State(..))
+import Data.CRDT (class StateBasedCRDT, defaultMerge)
 import Data.HashSet as HashSet
 import Data.HashSet as Set
 import Data.Hashable (class Hashable)
@@ -29,7 +29,7 @@ instance monoidTwoPhaseSet :: (Hashable t) => Monoid (TwoPhaseSet t) where
   mempty = TwoPhaseSet mempty mempty
 
 instance stateBasedCRDTTwoPhaseSet :: (Hashable t) => StateBasedCRDT (TwoPhaseSet t) where
-  mergeStates (State a) (State b) = State $ a <> b
+  merge = defaultMerge
 
 instance arbitraryTwoPhaseSet :: (Arbitrary t, Hashable t) => Arbitrary (TwoPhaseSet t) where
   arbitrary = do

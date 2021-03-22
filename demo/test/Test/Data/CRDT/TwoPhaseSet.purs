@@ -2,7 +2,7 @@ module Test.Data.CRDT.TwoPhaseSet where
 
 import Prelude
 
-import CRDT.TwoPhaseSet (TwoPhaseSet, insert, query, remove)
+import Data.CRDT.TwoPhaseSet (TwoPhaseSet, insert, query, remove)
 import Data.HashSet as Set
 import Test.Data.CRDT.Laws (stateBasedCRDTLaws)
 import Test.QuickCheck (Result, assertEquals)

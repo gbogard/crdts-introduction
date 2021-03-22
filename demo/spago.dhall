@@ -6,7 +6,6 @@ You can edit this file as you like.
 , dependencies =
   [ "console"
   , "effect"
-  , "lists"
   , "psci-support"
   , "quickcheck"
   , "spec"

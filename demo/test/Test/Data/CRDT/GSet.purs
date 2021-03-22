@@ -3,7 +3,7 @@ module Test.Data.CRDT.GSet where
 
 import Prelude
 import Test.Spec (Spec, describe, it)
-import CRDT.GSet (GSet, insert, query)
+import Data.CRDT.GSet (GSet, insert, query)
 import Data.HashSet as Set
 import Test.Data.CRDT.Laws (stateBasedCRDTLaws)
 import Test.QuickCheck (Result, assertEquals, (===))
