@@ -22,6 +22,8 @@ derive newtype instance monoidGSet :: (Hashable t) => Monoid (GSet t)
 instance arbitraryGSet :: (Arbitrary t, Hashable t) => Arbitrary (GSet t) where
   arbitrary = GSet <<< Set.fromArray <$> arbitrary 
 
+-- | This is a test and I'm doing great
+
 instance stateBasedCRDTGSet :: (Hashable t) => StateBasedCRDT (GSet t) where
   merge = defaultMerge
 
