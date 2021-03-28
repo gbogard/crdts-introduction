@@ -6,8 +6,10 @@ You can edit this file as you like.
 , dependencies =
   [ "console"
   , "effect"
+  , "halogen"
   , "psci-support"
   , "quickcheck"
+  , "routing"
   , "spec"
   , "spec-quickcheck"
   , "unordered-collections"
