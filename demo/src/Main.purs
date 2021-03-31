@@ -11,7 +11,7 @@ import Halogen as H
 import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 import Routing.PushState (makeInterface, matches)
-import UI.Router as Router
+import UI.Components.Router as Router
 
 main :: Effect Unit
 main =
