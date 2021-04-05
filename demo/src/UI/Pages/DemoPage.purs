@@ -5,7 +5,7 @@ import Capability.Navigate (class Navigate)
 import Data.Const (Const)
 import Data.Lens (Prism', prism')
 import Data.Maybe (Maybe(..))
-import Data.Route (Route(..), DemoType(..))
+import Data.Route (DemoType(..), Route)
 import Halogen as H
 import Halogen.HTML as HH
 import Type.Proxy (Proxy(..))
@@ -13,6 +13,8 @@ import UI.Components.Layout (layout)
 import UI.Components.Link as Link
 import UI.Components.StateBasedCRDT as StateBasedCRDT
 import UI.Components.StateBasedCRDT.GSet as GSetDemo
+import UI.Components.StateBasedCRDT.TwoPhaseSet as TwoPhaseSetDemo
+import UI.Components.StateBasedCRDT.GCounter as GCounterDemo
 
 type Slots
   = ( demo :: H.Slot (Const Void) Void Unit )
@@ -37,15 +39,28 @@ page demoType =
   render :: Unit -> HH.ComponentHTML Action Slots m
   render _ =
     layout _route
-      [ HH.slot_ (Proxy :: Proxy "demo") unit (StateBasedCRDT.mkDemo demoSpec) unit
+      [ HH.slot_ (Proxy :: Proxy "demo") unit demo unit
       ]
 
-  demoSpec = case demoType of
+  demo = case demoType of
     GSet ->
-      { title: "GSet - Grow-only Set"
-      , initialState: mempty
-      , editor: GSetDemo.editor
-      }
+      StateBasedCRDT.mkDemo
+        { title: "GSet - Grow-only Set"
+        , initialState: mempty
+        , editor: GSetDemo.editor
+        }
+    TwoPhaseSet ->
+      StateBasedCRDT.mkDemo
+        { title: "2PSet - Two-phase Set"
+        , initialState: mempty
+        , editor: TwoPhaseSetDemo.editor
+        }
+    GCounter ->
+      StateBasedCRDT.mkDemo
+        { title: "GCounter - Grow-only Counter"
+        , initialState: mempty
+        , editor: GCounterDemo.editor
+        }
 
   handleAction :: Action -> H.HalogenM Unit Action Slots Void m Unit
   handleAction = Link.handleAction _route

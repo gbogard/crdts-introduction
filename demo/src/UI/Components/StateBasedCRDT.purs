@@ -10,14 +10,17 @@ module UI.Components.StateBasedCRDT
   ) where
 
 import Prelude
-import Data.Array (last, sort)
-import Data.CRDT (class StateBasedCRDT, WithTimestamp, mergeStates)
+
+import Data.Array (intersperse, last, sort, sortBy)
+import Data.CRDT (class StateBasedCRDT, merge)
 import Data.Const (Const)
+import Data.Foldable (fold, foldl)
 import Data.FunctorWithIndex (mapWithIndex)
 import Data.HashMap as Map
 import Data.Maybe (Maybe(..))
 import Data.Replication (ReplicaId(..))
-import Data.Replication.VectorClock (increment)
+import Data.Replication.VectorClock (VectorClock(..))
+import Data.Tuple (Tuple(..))
 import Data.Tuple.Nested ((/\))
 import Halogen (defaultEval)
 import Halogen as H
@@ -27,10 +30,7 @@ import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 
 type DemoState t
-  = { replicas :: Map.HashMap ReplicaId (ReplicaState t) }
-
-type ReplicaState t
-  = WithTimestamp t
+  = { replicas :: Map.HashMap ReplicaId t }
 
 -- Parent component
 ----------------------------------------------------------------------------------------------------
@@ -62,6 +62,7 @@ type ParentSlots t
 
 mkDemo ::
   forall t m.
+  Eq t =>
   StateBasedCRDT t =>
   DemoSpec t m -> H.Component Query ParentInput ParentOutput m
 mkDemo spec =
@@ -75,7 +76,7 @@ mkDemo spec =
     HH.div_
       [ controlBar title state
       , HH.div [ HP.class_ $ H.ClassName "editors-container" ]
-          (Map.values $ mapWithIndex (editorEl editor) replicas)
+          (Map.values $ mapWithIndex (editorEl state editor) replicas)
       ]
 
   controlBar title st@{ replicas } =
@@ -85,18 +86,44 @@ mkDemo spec =
           [ roundButton [ HE.onClick \_ -> AddReplica ] [ HH.text "+" ]
           , HH.text <<< show <<< Map.size $ replicas
           , removeReplicaBtn st
+          , HH.button
+              [ HP.classes $ H.ClassName <$> [ "button", "is-link", "is-rounded", "is-small" ]
+              , HE.onClick \_ -> SyncAll
+              ]
+              [ HH.text "Sync everyhting" ]
           ]
       ]
 
-  editorEl editor rid replica =
+  editorEl state editor rid replica =
     HH.div [ HP.classes $ H.ClassName <$> [ "column", "is-one-quarter-desktop", "is-one-third-tablet" ] ]
       [ HH.div [ HP.class_ $ H.ClassName "box" ]
           [ HH.h5
               [ HP.classes $ H.ClassName <$> [ "title", "is-6", "has-text-centered" ] ]
               [ HH.text $ "Replica " <> show rid ]
-          , HH.slot (Proxy :: Proxy "editor") rid editor (EditorInput replica.data) (adaptEditorOutput rid)
+          , HH.slot (Proxy :: Proxy "editor") rid editor (EditorInput rid replica) (adaptEditorOutput rid)
+          , HH.br_
+          , HH.div [ HP.classes $ H.ClassName <$> [ "center-and-space-between", "my-1" ] ]
+              [ HH.text "Sync with"
+              , syncButtons state rid
+              ]
           ]
       ]
+
+  syncButtons { replicas } currentReplicaId =
+    HH.div [ HP.classes $ H.ClassName <$> [ "buttons", "has-addons" ] ]
+      ( replicas
+          # Map.delete currentReplicaId
+          # Map.keys
+          # sort
+          # map (syncButton currentReplicaId)
+      )
+
+  syncButton currentReplicaId rid =
+    HH.button
+      [ HP.class_ $ H.ClassName "button"
+      , HE.onClick \_ -> Sync currentReplicaId rid
+      ]
+      [ HH.text (show rid) ]
 
   removeReplicaBtn st@{ replicas } = case lastReplica st of
     Just rid
@@ -111,21 +138,22 @@ mkDemo spec =
     AddReplica -> H.modify_ $ addReplica spec.initialState
     RemoveReplica rid -> H.modify_ $ removeReplica rid
     ModifyReplica rid newState -> H.modify_ $ modifyReplica rid newState
-    _ -> pure unit
+    Sync a b -> H.modify_ $ sync a b
+    SyncAll -> H.modify_ syncAll
 
 -- Editor
 ----------------------------------------------------------------------------------------------------
 type Viewer t
   = t -> forall w i. HH.HTML w i
 
-newtype EditorInput t
-  = EditorInput t
+data EditorInput t
+  = EditorInput ReplicaId t
 
 newtype EditorOutput t
   = ModifiedState (t -> t)
 
 data EditorAction act t
-  = ReceiveParentInput t
+  = ReceiveParentInput ReplicaId t
   | NotifyParentAboutNewState (t -> t)
   | EditorSpecificAction act
 
@@ -133,8 +161,8 @@ type Editor t m
   = H.Component Query (EditorInput t) (EditorOutput t) m
 
 type EditorSpec state act t m
-  = { initialState :: t -> state
-    , updateState :: t -> state -> state
+  = { initialState :: ReplicaId -> t -> state
+    , updateState :: ReplicaId -> t -> state -> state
     , render :: state -> HH.ComponentHTML (EditorAction act t) () m
     , handleAction :: act -> H.HalogenM state (EditorAction act t) () (EditorOutput t) m Unit
     }
@@ -155,27 +183,44 @@ mkEditor spec =
             }
     }
   where
-  initialState (EditorInput t) = spec.initialState t
+  initialState (EditorInput rid t) = spec.initialState rid t
 
-  receive (EditorInput t) = Just $ ReceiveParentInput t
+  receive (EditorInput rid t) = Just $ ReceiveParentInput rid t
 
   handleAction = case _ of
-    ReceiveParentInput t -> H.modify_ $ spec.updateState t
+    ReceiveParentInput rid t -> H.modify_ $ spec.updateState rid t
     NotifyParentAboutNewState fn -> H.raise $ ModifiedState fn
     EditorSpecificAction act -> spec.handleAction act
+
+  -- Partials
+  ----------------------------------------------------------------------------------------------------
+  renderClock :: forall w i. VectorClock -> HH.HTML w i
+  renderClock (VectorClock components)
+    | Map.isEmpty components = HH.text ""
+
+  renderClock (VectorClock components) =
+    HH.div [ HP.class_ $ H.ClassName "clock" ]
+      $ [ HH.strong_ [ HH.text "Clock: " ] ]
+      <> ( components
+            # Map.toArrayBy Tuple
+            # sortBy sortByKey
+            # map renderClockComponent
+            # intersperse (HH.text " / ")
+        )
+    where
+    sortByKey (a /\ _) (b /\ _) = compare a b
+
+    renderClockComponent (rid /\ time) = HH.text $ show rid <> ":" <> show time
 
 -- Utility functions
 ----------------------------------------------------------------------------------------------------
 maxReplicas :: Int
 maxReplicas = 4
 
-defaultReplicaState :: forall t. t -> ReplicaState t
-defaultReplicaState initialState = { data: initialState, timestamp: mempty }
-
 defaultDemoState :: forall t. t -> DemoState t
 defaultDemoState initialState = { replicas: _ } <<< Map.fromArray <<< map makePair $ [ 1, 2 ]
   where
-  makePair i = ReplicaId i /\ defaultReplicaState initialState
+  makePair i = ReplicaId i /\ initialState
 
 addReplica :: forall t. t -> DemoState t -> DemoState t
 addReplica initialState st@{ replicas } =
@@ -184,33 +229,31 @@ addReplica initialState st@{ replicas } =
 
     nextReplicaId = ReplicaId $ currentSize + 1
 
-    newReplicaState = defaultReplicaState initialState
-
-    newDemoState = st { replicas = Map.insert nextReplicaId newReplicaState replicas }
+    newDemoState = st { replicas = Map.insert nextReplicaId initialState replicas }
   in
     if currentSize < maxReplicas then newDemoState else st
 
+-- | Given two replica ids, updates the state of the second replica by merging it with the state
+-- | of the first replica.
 sync ::
   forall t.
+  Eq t =>
   StateBasedCRDT t =>
-  DemoState t ->
-  ReplicaId -> ReplicaId -> DemoState t
-sync st@{ replicas } sourceId targetId = case (/\) <$> lookup' sourceId <*> lookup' targetId of
-  Just (sourceState /\ targetState) ->
-    let
-      replicas' = Map.insert targetId (mergeStates sourceState targetState) replicas
-    in
-      st { replicas = replicas' }
-  Nothing -> st
+  ReplicaId -> ReplicaId -> DemoState t -> DemoState t
+sync sourceId targetId st@{ replicas } = case merge <$> lookup' sourceId <*> lookup' targetId of
+  Just mergedState -> st { replicas = Map.insert targetId mergedState replicas }
+  _ -> st
   where
   lookup' = lookup st
 
-modifyReplica :: forall t. ReplicaId -> (t -> t) -> DemoState t -> DemoState t
-modifyReplica replicaId fn st@{ replicas } = st { replicas = Map.update updateAndIncTime replicaId replicas }
-  where
-  updateAndIncTime state = Just $ { data: fn state.data, timestamp: increment state.timestamp replicaId }
+syncAll :: forall t. Eq t => StateBasedCRDT t => DemoState t -> DemoState t
+syncAll st @ {replicas} = st { replicas = replicas $> fold replicas }
 
-lookup :: forall t. DemoState t -> ReplicaId -> Maybe (ReplicaState t)
+-- | Modifies the state of a specific replica using  a function, returns an updated 'DemoState'
+modifyReplica :: forall t. ReplicaId -> (t -> t) -> DemoState t -> DemoState t
+modifyReplica replicaId fn st@{ replicas } = st { replicas = Map.update (Just <<< fn) replicaId replicas }
+
+lookup :: forall t. DemoState t -> ReplicaId -> Maybe t
 lookup { replicas } rid = Map.lookup rid replicas
 
 removeReplica :: forall t. ReplicaId -> DemoState t -> DemoState t

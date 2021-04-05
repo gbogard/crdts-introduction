@@ -23,4 +23,4 @@ instance opCounterGenerator :: Generator OpCounter OpCounterOperation where
   generateOperations (OpCounter a) (OpCounter b) = [(Add (b - a))]
 
 instance opCounterEffector :: Effector OpCounter OpCounterOperation where
-  applyOperation {data: OpCounter currentState} {data: Add int} = OpCounter $ currentState + int
+  applyOperation (Add int) (OpCounter currentState) = OpCounter $ currentState + int

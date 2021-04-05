@@ -1,6 +1,7 @@
 module UI.Components.StateBasedCRDT.GSet where
 
 import Prelude
+
 import Data.Array (sort)
 import Data.CRDT.GSet as GSet
 import Data.HashSet as Set
@@ -27,13 +28,13 @@ editor =
     , handleAction
     }
   where
-  initialState gset = { currentInput: "", currentState: gset }
+  initialState _ gset = { currentInput: "", currentState: gset }
 
-  updateState gset st = st { currentState = gset, currentInput = "" }
+  updateState _ gset st = st { currentState = gset, currentInput = "" }
 
   render st@{ currentState } =
     HH.div_
-      [ list currentState
+      [ HH.div [HP.class_ $ H.ClassName "content"] [list currentState]
       , form st
       ]
 
@@ -48,19 +49,21 @@ editor =
               [ HH.input
                   [ HP.class_ $ H.ClassName "input"
                   , HP.placeholder "New element"
-                  , HE.onValueChange (EditorSpecificAction <<< SetCurrentInput)
+                  , HE.onValueInput (EditorSpecificAction <<< SetCurrentInput)
                   , HP.value currentInput
                   ]
               ]
           , HH.button
               [ HP.classes $ H.ClassName <$> [ "button", "is-link" ]
               , HE.onClick $ submit currentInput
+              , HP.disabled $ currentInput == ""
               ]
               [ HH.text "Add" ]
           ]
       ]
 
+  submit currentInput _ = NotifyParentAboutNewState $ GSet.insert currentInput
+
   handleAction = case _ of
     SetCurrentInput input -> H.modify_ \st -> st { currentInput = input }
 
-  submit currentInput _ = NotifyParentAboutNewState $ GSet.insert currentInput

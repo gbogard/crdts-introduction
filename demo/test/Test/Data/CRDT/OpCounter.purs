@@ -1,10 +1,10 @@
 module Test.Data.CRDT.OpCounter where
 
 import Prelude
-import Test.Spec
 
 import Data.CRDT.OpCounter (OpCounter)
 import Test.Data.CRDT.Laws (operationBasedCRDTLaws)
+import Test.Spec (Spec, describe)
 import Type.Proxy (Proxy(..))
 
 opCounterSpec :: Spec Unit

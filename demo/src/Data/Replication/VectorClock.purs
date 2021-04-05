@@ -24,7 +24,7 @@ instance arbitraryVectorClock :: Arbitrary VectorClock where
   arbitrary = VectorClock <<< Map.fromArray <$> arbitrary
 
 increment :: VectorClock -> ReplicaId -> VectorClock
-increment (VectorClock map) r = VectorClock $ Map.upsert (add 1) r 0 map
+increment (VectorClock map) r = VectorClock $ Map.insertWith add r 1 map
 
 -- | Returns whether a given event happens before another one
 -- | VC(x) denotes the VectorClock of an event x. 

@@ -35,3 +35,12 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+.clock {
+  @extend .has-text-centered;
+  @extend .has-text-grey;
+  strong {
+    @extend .has-text-grey;
+  }
+  font-size: .9rem;
+}

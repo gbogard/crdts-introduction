@@ -5,6 +5,8 @@ import Prelude
 
 data DemoType
   = GSet
+  | TwoPhaseSet
+  | GCounter
 
 derive instance genericDemoType :: Generic DemoType _
 
@@ -12,6 +14,8 @@ derive instance eqDemoType :: Eq DemoType
 
 instance showDemoType :: Show DemoType where
   show GSet = "gset"
+  show TwoPhaseSet = "2pset"
+  show GCounter = "gcounter"
 
 data Route
   = HomePage

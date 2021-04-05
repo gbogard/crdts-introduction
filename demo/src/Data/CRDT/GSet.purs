@@ -6,7 +6,7 @@ module Data.CRDT.GSet (
   
 import Prelude
 
-import Data.CRDT (class StateBasedCRDT, defaultMerge)
+import Data.CRDT (class StateBasedCRDT)
 import Data.HashSet as Set
 import Data.Hashable (class Hashable)
 import Test.QuickCheck (class Arbitrary, arbitrary)
@@ -22,10 +22,7 @@ derive newtype instance monoidGSet :: (Hashable t) => Monoid (GSet t)
 instance arbitraryGSet :: (Arbitrary t, Hashable t) => Arbitrary (GSet t) where
   arbitrary = GSet <<< Set.fromArray <$> arbitrary 
 
--- | This is a test and I'm doing great
-
-instance stateBasedCRDTGSet :: (Hashable t) => StateBasedCRDT (GSet t) where
-  merge = defaultMerge
+instance stateBasedCRDTGSet :: (Hashable t) => StateBasedCRDT (GSet t)
 
 query :: forall t. GSet t -> Set.HashSet t 
 query (GSet set) = set

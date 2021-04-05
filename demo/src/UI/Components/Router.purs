@@ -1,7 +1,6 @@
 module UI.Components.Router where
 
 import Prelude
-
 import Capability.Navigate (class Navigate)
 import Data.Const (Const)
 import Data.Foldable (oneOf)
@@ -21,11 +20,23 @@ data Query :: forall k. k -> Type
 data Query t
   = Navigate Route
 
+type BasicSlot
+  = H.Slot (Const Void) Void Unit
+
 type Slots
-  = ( "homepage" :: H.Slot (Const Void) Void Unit, "demo" :: H.Slot (Const Void) Void Unit )
+  = ( "homepage" :: BasicSlot
+    , "gsetDemo" :: BasicSlot
+    , "2pDemo" :: BasicSlot
+    , "gcounterDemo" :: BasicSlot
+    )
 
 matchDemoType :: Match DemoType
-matchDemoType = oneOf [ GSet <$ lit "gset" ]
+matchDemoType =
+  oneOf
+    [ GSet <$ lit "gset"
+    , TwoPhaseSet <$ lit "2pset"
+    , GCounter <$ lit "gcounter"
+    ]
 
 matchRoute :: Match Route
 matchRoute = root *> oneOf [ HomePage <$ end, Demo <$> (lit "demo" *> matchDemoType <* end) ]
@@ -42,7 +53,9 @@ render :: forall m action. Navigate m => Maybe Route -> H.ComponentHTML action S
 render = case _ of
   Nothing -> HH.text "not found"
   Just HomePage -> HH.slot_ (Proxy :: Proxy "homepage") unit HomePage.homePage unit
-  Just (Demo demoType) -> HH.slot_ (Proxy :: Proxy "demo") unit (DemoPage.page demoType) unit
+  Just (Demo GSet) -> HH.slot_ (Proxy :: Proxy "gsetDemo") unit (DemoPage.page GSet) unit
+  Just (Demo TwoPhaseSet) -> HH.slot_ (Proxy :: Proxy "2pDemo") unit (DemoPage.page TwoPhaseSet) unit
+  Just (Demo GCounter) -> HH.slot_ (Proxy :: Proxy "gcounterDemo") unit (DemoPage.page GCounter) unit
 
 handleQuery ::
   forall t m action output.

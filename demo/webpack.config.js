@@ -1,7 +1,6 @@
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CompressionPlugin = require("compression-webpack-plugin");
 const { resolve } = require("path");
 
 const mode =
@@ -13,8 +12,10 @@ module.exports = {
   entry: "./index.js",
   plugins: [
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin(),
-    new CompressionPlugin(),
+    new HtmlWebpackPlugin({
+      title:
+        "A gentle introduction to conflict-free replicated data types (CRDT) - Guillaume Bogard",
+    }),
     new MiniCssExtractPlugin({
       filename: isProduction ? "[name].[contenthash].css" : "[name].css",
     }),
@@ -35,6 +36,6 @@ module.exports = {
   output: {
     filename: isProduction ? "[name].[contenthash].js" : "[name].js",
     path: resolve(__dirname, "dist"),
-    publicPath: "/"
+    publicPath: "/",
   },
 };

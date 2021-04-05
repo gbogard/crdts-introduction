@@ -2,7 +2,7 @@ module Test.Data.CRDT.GCounter where
 
 import Prelude
 
-import Data.CRDT.GCounter (GCounter, increment, value)
+import Data.CRDT.GCounter (GCounter, increment, query)
 import Data.Replication (ReplicaId)
 import Test.Data.CRDT.Laws (stateBasedCRDTLaws)
 import Test.QuickCheck (Result, (===))
@@ -19,4 +19,4 @@ gCounterSpec =
   where
     incrementCurrentValue :: GCounter -> ReplicaId -> Result
     incrementCurrentValue counter replica =
-      (increment replica counter # value) === (value counter + 1)
+      (increment replica counter # query) === (query counter + 1)
