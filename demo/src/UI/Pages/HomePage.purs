@@ -1,7 +1,6 @@
-module UI.Pages.HomePage (homePage, WithHomePage) where
+module UI.Pages.HomePage (homePage) where
 
 import Prelude
-
 import Capability.Navigate (class Navigate)
 import Data.Const (Const)
 import Data.Lens (Prism', prism')
@@ -11,9 +10,6 @@ import Halogen as H
 import Halogen.HTML as HH
 import UI.Components.Layout (layout)
 import UI.Components.Link as Link
-
-type WithHomePage r
-  = ( "homepage" :: H.Slot (Const Void) Void Unit | r )
 
 data Action
   = Navigate Route

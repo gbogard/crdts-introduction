@@ -7,6 +7,7 @@ You can edit this file as you like.
   [ "console"
   , "effect"
   , "halogen"
+  , "now"
   , "profunctor-lenses"
   , "psci-support"
   , "quickcheck"

@@ -9,5 +9,6 @@ newtype ReplicaId = ReplicaId Int
 
 derive newtype instance showReplicaId :: Show ReplicaId
 derive newtype instance eqReplicaId :: Eq ReplicaId
+derive newtype instance ordReplicaId :: Ord ReplicaId
 derive newtype instance hashableReplicaId :: Hashable ReplicaId
 derive newtype instance arbitraryReplicaId :: Arbitrary ReplicaId

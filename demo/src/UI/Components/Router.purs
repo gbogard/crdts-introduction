@@ -1,7 +1,9 @@
 module UI.Components.Router where
 
 import Prelude
+
 import Capability.Navigate (class Navigate)
+import Data.Const (Const)
 import Data.Foldable (oneOf)
 import Data.Maybe (Maybe(..))
 import Data.Route (DemoType(..), Route(..))
@@ -9,6 +11,7 @@ import Halogen as H
 import Halogen.HTML as HH
 import Routing.Match (Match, lit, root, end)
 import Type.Proxy (Proxy(..))
+import UI.Pages.DemoPage as DemoPage
 import UI.Pages.HomePage as HomePage
 
 type State
@@ -19,7 +22,7 @@ data Query t
   = Navigate Route
 
 type Slots
-  = HomePage.WithHomePage ()
+  = ( "homepage" :: H.Slot (Const Void) Void Unit, "demo" :: H.Slot (Const Void) Void Unit )
 
 matchDemoType :: Match DemoType
 matchDemoType = oneOf [ GSet <$ lit "gset" ]
@@ -39,7 +42,7 @@ render :: forall m action. Navigate m => Maybe Route -> H.ComponentHTML action S
 render = case _ of
   Nothing -> HH.text "not found"
   Just HomePage -> HH.slot_ (Proxy :: Proxy "homepage") unit HomePage.homePage unit
-  (Just (Demo GSet)) -> HH.text "gset demo"
+  Just (Demo demoType) -> HH.slot_ (Proxy :: Proxy "demo") unit (DemoPage.page demoType) unit
 
 handleQuery ::
   forall t m action output.

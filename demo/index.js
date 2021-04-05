@@ -1,4 +1,4 @@
-const Main = require("./output/Main");
+const Main = require("./output/UI.Main");
 require("./assets/style.scss");
 
 function main() {

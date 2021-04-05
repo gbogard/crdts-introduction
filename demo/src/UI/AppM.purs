@@ -1,4 +1,4 @@
-module AppM where
+module UI.AppM where
 
 import Prelude
 import Capability.Navigate (class Navigate)

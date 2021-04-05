@@ -1,9 +1,9 @@
-module Main where
+module UI.Main where
 
 import Prelude
-import AppM (Env, runAppM)
-import Data.Maybe (Maybe(..))
+import UI.AppM (Env, runAppM)
 import Data.Route (Route)
+import Data.Maybe (Maybe)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
@@ -26,6 +26,5 @@ main =
     halogenIO <- runUI rootComponent {} body
     let
       routeListener :: Maybe Route -> Route -> Effect Unit
-      routeListener old new =
-          launchAff_ $ halogenIO.query $ Router.Navigate new
+      routeListener old new = launchAff_ $ halogenIO.query $ Router.Navigate new
     void <<< liftEffect $ matches Router.matchRoute routeListener routingInterface

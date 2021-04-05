@@ -1,1 +1,37 @@
-@import "~bulma/bulma.sass"
+@import "~bulma/bulma.sass";
+
+html,
+body {
+  background-color: $light;
+}
+
+.control-bar {
+  height: $navbar-height;
+  @extend .has-text-light;
+  @extend .has-background-dark;
+  @extend .px-3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  > div {
+    display: flex;
+    align-items: center;
+
+    button {
+      @extend .mx-2;
+    }
+  }
+}
+
+.editors-container {
+  @extend .columns;
+  @extend .p-4;
+  overflow-y: auto;
+  width: 100vw;
+}
+
+.center-and-space-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
