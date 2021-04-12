@@ -23,9 +23,15 @@ navbar _route =
             , navbarLink _route (Demo TwoPhaseSet) [ HH.text "Two-Phase Set" ]
             ]
         , menu "Operation-based CRDTs" []
-        , navbarLink _route HomePage [ HH.text "Slides" ]
+        , HH.a [ HP.class_ $ HH.ClassName "navbar-item", HP.href "" ] [ HH.text "Slides" ]
         ]
-        [ HH.text "Github" ]
+        [ HH.a
+            [ HP.classes $ HH.ClassName <$> [ "navbar-item", "has-text-weight-semibold" ]
+            , HP.href "https://github.com/gbogard/crdts-introduction"
+            ]
+            [ HH.text "Github"
+            ]
+        ]
     ]
   where
   navbarBrand = HH.div [ HP.class_ $ HH.ClassName "navbar-brand" ]

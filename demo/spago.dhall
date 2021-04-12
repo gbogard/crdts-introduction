@@ -15,6 +15,7 @@ You can edit this file as you like.
   , "spec"
   , "spec-quickcheck"
   , "unordered-collections"
+  , "purescript-html-parser-halogen"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

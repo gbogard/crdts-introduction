@@ -8,8 +8,11 @@ import Data.Maybe (Maybe(..))
 import Data.Route (Route(..), DemoType(..))
 import Halogen as H
 import Halogen.HTML as HH
+import Halogen.HTML.Properties as HP
 import UI.Components.Layout (layout)
 import UI.Components.Link as Link
+import Html.Renderer.Halogen as RH
+import UI.Pages.Static as Static
 
 data Action
   = Navigate Route
@@ -31,10 +34,9 @@ homePage =
 render :: forall m. Navigate m => Unit -> HH.ComponentHTML Action () m
 render _ =
   layout _route
-    [ HH.h1_ [ HH.text "CRDT Demo" ]
-    , Link.link_ _route HomePage [ HH.text "Home" ]
-    , HH.br_
-    , Link.link_ _route (Demo GSet) [ HH.text "GSet demo" ]
+    [ HH.div [ HP.class_ $ H.ClassName "centered-container" ]
+        [ RH.render_ Static.readme
+        ]
     ]
 
 handleAction :: forall m. Navigate m => Action -> H.HalogenM Unit Action () Void m Unit

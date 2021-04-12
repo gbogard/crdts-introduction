@@ -107,4 +107,17 @@ in  upstream
 let upstream =
       https://github.com/purescript/package-sets/releases/download/psc-0.14.0-20210318/packages.dhall sha256:98bbacd65191cef354ecbafa1610be13e183ee130491ab9c0ef6e3d606f781b5
 
-in  upstream
+let additions = {
+  purescript-html-parser-halogen =
+    { dependencies =
+        [ "string-parsers"
+        , "halogen"
+        ]
+    , repo =
+        "https://github.com/rnons/purescript-html-parser-halogen"
+    , version =
+        "v1.0.0-rc.2"  -- branch, tag, or commit hash
+    }
+}
+
+in  upstream // additions

@@ -23,6 +23,13 @@ body {
   }
 }
 
+.centered-container {
+  @extend .container;
+  @extend .mt-6;
+  @extend .p-1;
+  @extend .content;
+}
+
 .editors-container {
   @extend .columns;
   @extend .p-4;
