@@ -9,3 +9,4 @@ generated-docs/
 .psa*
 .spago
 dist/
+.vscode
