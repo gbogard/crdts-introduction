@@ -48,6 +48,14 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.png$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      }
     ],
   },
   output: {

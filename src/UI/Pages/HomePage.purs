@@ -35,7 +35,10 @@ render :: forall m. Navigate m => Unit -> HH.ComponentHTML Action () m
 render _ =
   layout _route
     [ HH.div [ HP.class_ $ H.ClassName "centered-container" ]
-        [ RH.render_ Static.readme
+        [ HH.img
+            [ HP.src Static.firstSlide
+            ]
+        , RH.render_ Static.readme
         ]
     ]
 
