@@ -1,4 +1,5 @@
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const RemarkHTML = require("remark-html");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -20,6 +21,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: isProduction ? "[name].[contenthash].css" : "[name].css",
     }),
+    new CopyPlugin({ patterns: [{ from: "slides", to: "slides" }] }),
   ],
   devServer: {
     contentBase: "./dist",
@@ -52,10 +54,10 @@ module.exports = {
         test: /\.png$/i,
         use: [
           {
-            loader: 'file-loader',
+            loader: "file-loader",
           },
         ],
-      }
+      },
     ],
   },
   output: {

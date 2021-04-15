@@ -1,13 +1,11 @@
 module Data.CRDT
-  ( -- * Classes
-  class StateBasedCRDT
+  ( class StateBasedCRDT
   , merge
   , class Generator
   , generateOperations
   , class Effector
   , applyOperation
-  , -- * Functions
-   applyOperations
+  , applyOperations
   ) where
 
 import Prelude

@@ -22,7 +22,7 @@ navbar _route =
             , navbarLink _route (Demo GCounter) [ HH.text "GCounter" ]
             , navbarLink _route (Demo TwoPhaseSet) [ HH.text "Two-Phase Set" ]
             ]
-        , HH.a [ HP.class_ $ HH.ClassName "navbar-item", HP.href "" ] [ HH.text "Slides" ]
+        , HH.a [ HP.class_ $ HH.ClassName "navbar-item", HP.href "/slides/" ] [ HH.text "Slides" ]
         ]
         [ HH.a
             [ HP.classes $ HH.ClassName <$> [ "navbar-item", "has-text-weight-semibold" ]
