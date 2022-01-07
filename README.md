@@ -1,7 +1,7 @@
 # A gentle introduction to Conflict-free replicated data types
 
-Conflict-free replicated data types, or CRDT for short, enable seamless optimistic replication of 
-data in distributed system. They achieve that goal by pairing sets with merge operations, which together allow
+Conflict-free replicated data types, or CRDTs for short, enable seamless optimistic replication of 
+data in distributed systems. They achieve that goal by pairing sets with merge operations, which together allow
 many states to always converge by construction.
 
 This is a conference talk aimed at programmers, together with code examples and interactive demos, that introduces
@@ -14,7 +14,7 @@ Feel free to look at the slides, play around with the demos, and take a look at 
 
 ### Strong consistency
 
-A concurrency model for multithreaded applications and distributed systems, in which all updates strictly sequential across the entire system.
+A concurrency model for multithreaded applications and distributed systems, in which all updates are strictly sequential across the entire system.
 Therefore, only one consistent state can be observed by all the participants in the system.
 In the case of distributed systems, strong consistency is typically achieved using consensus protocols which
 are rather expansive.
@@ -25,14 +25,14 @@ A concurrency model in which views of the system are allowed to temporarily dive
 in the system can observe different states at the same time), but will eventually converge to the same state
 if no new updates are made.
 
-Eventually consistent systems still need a form a consensus to reconciliate conflicting updates, but
+Eventually consistent systems still need a form of consensus to reconcile conflicting updates, but
 not in real time. This is why they are way faster than strongly consistent systems with regard to
-write performance, as writes require no coordination among the nodes.
+write performance, as the writes require no coordination among the nodes.
 
 ### Strong eventual consistency
 
 Strong eventual consistency (SEC) is eventual consistency with additional safety guarantees:
-SEC systems are guaranteed to reconciliate concurrent updates whereas eventually consistent systems
+SEC systems are guaranteed to reconcilie concurrent updates whereas eventually consistent systems
 roll back conflicting updates when they cannot figure out a way to solve conflicts.
 
 Strong eventual consistency is achieved by implementing conflict-resolution strategies that
@@ -82,6 +82,8 @@ Here are the papers, blog articles and videos that have helped me prepare this t
 - CRDT: Conflict-free Replicated Data Types | by Anton Zagorskii | Medium. Retrieved April 13, 2021 from <https://medium.com/@amberovsky/crdt-conflict-free-replicated-data-types-b4bfc8459d26>
 
 - Luka Jacobowitz. 2020. Monoids, monoids, monoids. Konfy. Retrieved April 13, 2021 from <https://www.youtube.com/watch?v=pLpxRnAPteA>
+- Nikita Voloboev [Everything I know](https://wiki.nikitavoloboev.xyz/distributed-systems/crdt)
+- Jo Stichbury/Paddy Byers [How do CRDTs solve distributed data consistency challenges?](https://ably.com/blog/crdts-distributed-data-consistency-challenges)
 
 I also recommend the website [crdt.tech](https://crdt.tech/), created by Martin Kleppmann, Annette Bieniusa, and Marc Shapiro, which features a lot of resources to learn about CRDTs, including papers, talks and definitions.
 
@@ -94,5 +96,5 @@ Feel free to suggest improvements and corrections by opening a [pull request](ht
 
 ## License
 
-The source code fir this website and the slides of the talk are released under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Feel free to reuse the code and examples,
+The source code for this website and the slides of the talk are released under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Feel free to reuse the code and examples,
 as long as you credit me as the original author. 
